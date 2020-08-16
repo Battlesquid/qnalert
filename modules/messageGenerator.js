@@ -1,6 +1,6 @@
+const config = require('../config.json');
 const db = require('./database');
 const { MessageEmbed } = require('discord.js');
-const config = require('../config.json');
 
 const generateEmbeds = async (category, answeredIDs) => {
     const embeds = [];

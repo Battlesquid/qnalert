@@ -20,7 +20,7 @@ module.exports.check = async (client, poppables = []) => {
                 continue;
             }
 
-            console.log(`New responses detected for ${category}, sending messages.`);
+            console.log(`New ${category} responses detected, sending messages.`);
             const sent = await sendQuestions(client, category, answeredIDs);
 
             if (sent) {
