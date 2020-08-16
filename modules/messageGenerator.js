@@ -1,11 +1,14 @@
 const db = require('./database');
 const { MessageEmbed } = require('discord.js');
+const config = require('../config.json');
 
 const generateEmbeds = async (category, answeredIDs) => {
     const embeds = [];
     const colors = {
         VRC: "#E62525", VEXU: "#952CD1",
-        VIQC: "#226AE6", Judging: "#E6A122"
+        "VAIC-HS": "#4FDE28", "VAIC-U": "#4FDE28",
+        VIQC: "#226AE6", Judging: "#E6A122",
+        RAD: "#4FDE28"
     }
 
     for (const id of answeredIDs) {
@@ -26,12 +29,12 @@ const generateEmbeds = async (category, answeredIDs) => {
 }
 
 module.exports.sendQuestions = async (client, category, answeredIDs) => {
-    const channels = await db.collection("subscribed").get();
-    const flatChannels = channels.docs.map(doc => doc.data().channel);
+    const sent = true;
     const embeds = await generateEmbeds(category, answeredIDs);
-
-    for (const channelID of flatChannels) {
-        const channel = await client.channels.fetch(channelID);
+    try {
+        const channel = await client.channels.fetch(config.categories[category]);
         embeds.forEach(async embed => await channel.send(embed));
-    }
+
+    } catch (e) { console.log("Error sending messages!", e), sent = false; }
+    return sent;
 }

@@ -2,13 +2,16 @@ require('dotenv').config();
 
 const { Client } = require('discord.js');
 const bot = new Client({
-    messageCacheMaxSize: 1, messageSweepInterval: 60, messageCacheLifetime: 120, presence: {
+    messageCacheMaxSize: 1, messageSweepInterval: 60, messageCacheLifetime: 30, presence: {
         activity: {
             type: "WATCHING",
             name: `the GDC 👀`
         }
     }
 });
-require('./scheduler.js')(bot);
+const scheduler = require('./scheduler');
+scheduler.once(bot, ["VIQC", "VEXU"]);
+
+// scheduler.start(client);
 
 bot.login(process.env.TOKEN);

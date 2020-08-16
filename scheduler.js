@@ -1,37 +1,52 @@
-const util = require('./modules/util');
+const config = require('./config.json');
 const { sendQuestions } = require('./modules/messageGenerator');
 const { getStoredIDs, removeStoredIDs } = require('./modules/idHandler');
 const { getCurrentQuestions } = require('./modules/fetchQuestions');
-
 const cron = require('node-cron');
 
-module.exports = client => {
-    cron.schedule("*/5 * * * * *", async function check() {
-        for (const category of ["VRC", "VEXU", "VIQC", "Judging"]) {
-            try {
-                const currentIDs = await getCurrentQuestions(category, pageCount);
-                const storedIDs = await getStoredIDs(category);
-                const answeredIDs = storedIDs.map(id => !currentIDs.includes(id) ? id : false).filter(id => id);
+module.exports.check = async (client, poppables = []) => {
+    for (const category of Object.keys(config.categories)) {
+        try {
+            const currentIDs = await getCurrentQuestions(category);
+            const storedIDs = await getStoredIDs(category);
 
-                if (!answeredIDs.length) {
-                    console.log("No new responses");
-                    continue;
+            //solely for testing purposes
+            if (poppables.includes(category)) currentIDs.pop();
+
+            const answeredIDs = storedIDs.map(id => !currentIDs.includes(id) ? id : false).filter(id => id);
+
+            if (!answeredIDs.length) {
+                console.log(`No new reponses for ${category}`);
+                continue;
+            }
+
+            console.log(`New responses detected for ${category}, sending messages.`);
+            const sent = await sendQuestions(client, category, answeredIDs);
+
+            if (sent) {
+                console.log("Successfully sent messages");
+                if (!poppables.length) {
+                    await removeStoredIDs(category, answeredIDs);
                 }
-
-                await sendQuestions(client, category, answeredIDs);
-                await removeStoredIDs(category, answeredIDs);
-            } catch (e) { console.log(e); }
-        }
-    });
-    cron.schedule("55 9 * * *", async function update() {
-        const { years_start, years_end } = await util.getActiveSeason();
-
-        for (const category of ["VRC", "VEXU", "Judging", "VIQC"]) {
-            try {
-                await getCurrentQuestions(category, `https://www.robotevents.com/${category}/${years_start}-${years_end}/QA`, true);
-            } catch (e) { console.log(e); }
-        }
-    })
+            } else {
+                console.log(`Failed to send messages for ${category}, will retry on next scheduled check.`);
+            }
+        } catch (e) { console.log(e); }
+    }
 }
 
+module.exports.update = async () => {
+    for (const category of Object.keys(config.categories)) {
+        try {
+            await getCurrentQuestions(category, true);
+        } catch (e) { console.log(e); }
+    }
+}
 
+module.exports.start = client => {
+    cron.schedule("*/30 * * * * *", module.exports.check(client))
+    cron.schedule("55 9 * * *", module.exports.update())
+}
+
+//solely for testing purposes
+module.exports.once = (client, poppables) => module.exports.check(client, poppables);
