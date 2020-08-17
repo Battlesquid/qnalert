@@ -8,13 +8,14 @@ const bot = new Client({
     presence: {
         activity: {
             type: "WATCHING",
-            name: `the GDC 👀`
+            name: "the GDC 👀"
         }
     }
 });
 
 const scheduler = require('./scheduler');
 scheduler.once(bot, ["VRC", "VEXU"]);
+// scheduler.update();
 // scheduler.start(client);
 
 bot.login(process.env.TOKEN);

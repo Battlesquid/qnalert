@@ -1,12 +1,14 @@
-const { createLogger, transports, format } = require('winston');
-const winston = require("winston");
+const { createLogger, transports, format, addColors } = require('winston');
 const { timestamp, printf, combine, colorize } = format;
 
 const logger = createLogger({
     transports: [
-        new transports.Console({ format: colorize({ all: true }), level: "notify" }),
-        new transports.File({ filename: "logs/info.log", level: "notify" }),
-        new transports.File({ filename: "logs/error.log", level: "error" })
+        new transports.Console({ level: "notify", format: combine(colorize({ all: true })) }),
+        new transports.File({ level: "notify", filename: "logs/info.log" }),
+        new transports.File({ level: "error", filename: "logs/error.log" })
+    ],
+    exceptionHandlers: [
+        new transports.File({ filename: "logs/exceptions.log" })
     ],
     format: combine(timestamp(), printf(log => `[${log.timestamp}] | ${log.level.toUpperCase()} | ${log.message}`)),
     levels: {
@@ -17,7 +19,7 @@ const logger = createLogger({
     }
 })
 
-winston.addColors({
+addColors({
     error: "red",
     alert: "yellow",
     info: "cyan",

@@ -1,6 +1,6 @@
 const config = require('./config.json');
 const cron = require('node-cron');
-const logger = require('./modules/logger.js');
+const logger = require('./modules/logger');
 const { sendQuestions } = require('./modules/messageGenerator');
 const { getStoredIDs, removeStoredIDs } = require('./modules/idHandler');
 const { getCurrentQuestions } = require('./modules/fetchQuestions');
@@ -37,7 +37,7 @@ module.exports.check = async (client, poppables = []) => {
             } else {
                 logger.alert(`Failed to send messages for ${category}, will retry on next scheduled check.\n`);
             }
-        } catch (e) { logger.error(`Something weird happened : ${e}`) }
+        } catch (e) { logger.error(`Something weird happened: ${e}`) }
     }
 }
 
@@ -48,12 +48,13 @@ module.exports.update = async () => {
             await getCurrentQuestions(category, true);
         } catch (e) { logger.error(`Unable to update questions from the ${category} Q&A.\n`) }
     }
-    logger.info("Successfully updated question queue.\n")
+    logger.notify("Successfully updated question queue.\n")
 }
 
 module.exports.start = client => {
-    cron.schedule("*/30 * * * * *", module.exports.check(client))
-    cron.schedule("55 9 * * *", module.exports.update())
+    if (!(cron.validate(config.checkPollingRate) && cron.validate(config.updatePollingRate))) return;
+    cron.schedule(config.checkPollingRate, module.exports.check(client))
+    cron.schedule(config.updatePollingRate, module.exports.update())
 }
 
 //solely for testing purposes
