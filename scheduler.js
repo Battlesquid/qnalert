@@ -1,46 +1,54 @@
 const config = require('./config.json');
+const cron = require('node-cron');
+const logger = require('./modules/logger.js');
 const { sendQuestions } = require('./modules/messageGenerator');
 const { getStoredIDs, removeStoredIDs } = require('./modules/idHandler');
 const { getCurrentQuestions } = require('./modules/fetchQuestions');
-const cron = require('node-cron');
 
 module.exports.check = async (client, poppables = []) => {
     for (const category of Object.keys(config.categories)) {
         try {
+            logger.info(`Fetching unanswered questions for ${category}...`);
             const currentIDs = await getCurrentQuestions(category);
+
+            logger.info(`Fetching stored question queue for ${category}...`);
             const storedIDs = await getStoredIDs(category);
 
             //solely for testing purposes
             if (poppables.includes(category)) currentIDs.pop();
 
             const answeredIDs = storedIDs.map(id => !currentIDs.includes(id) ? id : false).filter(id => id);
+            logger.alert(`Responses detected (IDs): ${answeredIDs.length ? answeredIDs.join(", ") : "[none]"}`);
 
             if (!answeredIDs.length) {
-                console.log(`No new reponses for ${category}`);
+                logger.info(`No new reponses for ${category}\n`);
                 continue;
             }
 
-            console.log(`New ${category} responses detected, sending messages.`);
+            logger.log("alert", `New ${category} responses detected, sending messages.`);
             const sent = await sendQuestions(client, category, answeredIDs);
 
             if (sent) {
-                console.log("Successfully sent messages");
+                logger.notify(`Successfully sent messages for ${category}\n`)
                 if (!poppables.length) {
                     await removeStoredIDs(category, answeredIDs);
+                    logger.info(`Removed IDs ${answeredIDs.join(", ")} from the question queue.\n`)
                 }
             } else {
-                console.log(`Failed to send messages for ${category}, will retry on next scheduled check.`);
+                logger.alert(`Failed to send messages for ${category}, will retry on next scheduled check.\n`);
             }
-        } catch (e) { console.log(e); }
+        } catch (e) { logger.error(`Something weird happened : ${e}`) }
     }
 }
 
 module.exports.update = async () => {
+    logger.info("Updating question queue...");
     for (const category of Object.keys(config.categories)) {
         try {
             await getCurrentQuestions(category, true);
-        } catch (e) { console.log(e); }
+        } catch (e) { logger.error(`Unable to update questions from the ${category} Q&A.\n`) }
     }
+    logger.info("Successfully updated question queue.\n")
 }
 
 module.exports.start = client => {

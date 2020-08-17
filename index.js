@@ -12,9 +12,9 @@ const bot = new Client({
         }
     }
 });
-const scheduler = require('./scheduler');
-scheduler.once(bot, ["VIQC", "Judging"]);
 
+const scheduler = require('./scheduler');
+scheduler.once(bot, ["VRC", "VEXU"]);
 // scheduler.start(client);
 
 bot.login(process.env.TOKEN);

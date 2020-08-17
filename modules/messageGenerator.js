@@ -1,6 +1,7 @@
 const config = require('../config.json');
 const db = require('./database');
 const { MessageEmbed } = require('discord.js');
+const logger = require('../modules/logger');
 
 const generateEmbeds = async (category, answeredIDs) => {
     const embeds = [];
@@ -29,12 +30,13 @@ const generateEmbeds = async (category, answeredIDs) => {
 }
 
 module.exports.sendQuestions = async (client, category, answeredIDs) => {
-    const sent = true;
+    let sent = true;
     const embeds = await generateEmbeds(category, answeredIDs);
     try {
+        throw Error("not actually an error just a test")
+
         const channel = await client.channels.fetch(config.categories[category]);
         embeds.forEach(async embed => await channel.send(embed));
-
-    } catch (e) { console.log("Error sending messages!", e), sent = false; }
+    } catch (e) { logger.error(e), sent = false; }
     return sent;
 }
