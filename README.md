@@ -1,3 +1,3 @@
-# qAbeta
+# qA_2
 
-Repo for the beta version of qA. Undergoing major recode, open issue or pr if improvements can be made.
+Repo for the beta version of qA.
