@@ -23,7 +23,7 @@ const getPageCount = async url => {
     return pageCount;
 }
 
-module.exports.getCurrentQuestions = async (category, update = false) => {
+module.exports.getCurrentQuestions = async category => {
     const ids = [];
     const batch = db.batch();
 
@@ -36,7 +36,7 @@ module.exports.getCurrentQuestions = async (category, update = false) => {
 
         const $ = load(html);
         const questions = $('.panel-body').children('h4.title:not(:has(a span))').toArray();
-        
+
         const promises = questions.map(async question => {
             const url = unleak($(question).children('a').attr('href'));
             const id = url.match(/QA\/(\d+)/)[1];
@@ -44,7 +44,7 @@ module.exports.getCurrentQuestions = async (category, update = false) => {
             const questionRef = db.collection(category).doc(id);
             const questionSnapshot = await questionRef.get();
 
-            if (update || !questionSnapshot.exists) {
+            if (!questionSnapshot.exists) {
                 //ps i hate scraping
                 const title = unleak(unformat(unleak($(question).text())));
                 const author = unleak(unformat(unleak($(question).nextUntil('hr').children('.details').children('.author').text())));
@@ -56,12 +56,12 @@ module.exports.getCurrentQuestions = async (category, update = false) => {
                 //because i'm paranoid of the string memory issue
                 const timestamp = unleak(unformat(unleak($(question).nextUntil('hr').children('.details').children('.timestamp').text())));
                 batch.update(questionRef, { timestamp })
-                ids.push(id);
             }
+            ids.push(id);
         })
         await Promise.all(promises);
     }
 
     await batch.commit();
-    return update ? undefined : ids;
+    return ids;
 }

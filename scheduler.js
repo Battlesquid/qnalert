@@ -41,20 +41,12 @@ module.exports.check = async (client, poppables = []) => {
     }
 }
 
-module.exports.update = async () => {
-    logger.info("Updating question queue...");
-    for (const category of Object.keys(config.categories)) {
-        try {
-            await getCurrentQuestions(category, true);
-        } catch (e) { logger.error(`Unable to update questions from the ${category} Q&A.\n`) }
-    }
-    logger.notify("Successfully updated question queue.\n")
-}
-
 module.exports.start = client => {
-    if (!(cron.validate(config.checkPollingRate) && cron.validate(config.updatePollingRate))) return;
-    cron.schedule(config.checkPollingRate, module.exports.check(client))
-    cron.schedule(config.updatePollingRate, module.exports.update())
+    if (!cron.validate(config.pollingRate)) {
+        console.log("invalid cron time, killing process");
+        process.kill();
+    }
+    cron.schedule(config.pollingRate, () => module.exports.check(client))
 }
 
 //solely for testing purposes
