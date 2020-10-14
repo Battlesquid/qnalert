@@ -14,7 +14,8 @@ const bot = new Client({
 });
 
 const scheduler = require('./scheduler');
-scheduler.start(bot);
-// scheduler.once(bot, ["VRC", "VEXU"]);
-
-bot.login(process.env.TOKEN);
+(async () => {
+	await bot.login(process.env.TOKEN);
+	await scheduler.once(bot);
+	process.exit();
+})()
