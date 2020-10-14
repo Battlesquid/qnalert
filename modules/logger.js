@@ -2,6 +2,8 @@ const { createLogger, transports, format, addColors } = require('winston');
 const { timestamp, printf, combine, colorize } = format;
 const path = require("path");
 
+const timezone = () => new Date().toLocaleString('en-US', { timeZone: 'America/Phoenix' }) 
+
 const logger = createLogger({
     transports: [
         new transports.Console({ level: "notify", format: combine(colorize({ all: true })) }),
@@ -11,7 +13,7 @@ const logger = createLogger({
     exceptionHandlers: [
 	new transports.File({ filename: path.resolve(__dirname, "../logs/exceptions.log") })
     ],
-    format: combine(timestamp(), printf(log => `[${log.timestamp}] | ${log.level.toUpperCase()} | ${log.message}`)),
+    format: combine(timestamp({format: timezone}), printf(log => `[${log.timestamp}] | ${log.level.toUpperCase()} | ${log.message}`)),
     levels: {
         error: 0,
         alert: 1,
