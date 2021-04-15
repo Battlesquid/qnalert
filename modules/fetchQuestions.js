@@ -28,10 +28,12 @@ module.exports.getCurrentQuestions = async category => {
     const batch = db.batch();
 
     const { years_start, years_end } = await getActiveSeason();
-    const pageCount = await getPageCount(`https://www.robotevents.com/${category}/${years_start}-${years_end}/QA`);
+    const pageCount = await getPageCount(`https://www.robotevents.com/${category}/2020-2021/QA`);
+    console.log(pageCount);
+    console.log(`https://www.robotevents.com/${category}/2020-2021/QA`);
 
     for (let i = 1; i <= pageCount; i++) {
-        const response = await fetch(`https://www.robotevents.com/${category}/${years_start}-${years_end}/QA?page=${i}`);
+        const response = await fetch(`https://www.robotevents.com/${category}/2020-2021/QA?page=${i}`);
         const html = unleak((await response.text()));
 
         const $ = load(html);
