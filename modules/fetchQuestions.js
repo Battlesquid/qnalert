@@ -37,7 +37,7 @@ module.exports.getCurrentQuestions = async category => {
         const html = unleak((await response.text()));
 
         const $ = load(html);
-        const questions = $('.panel-body').children('h4.title:not(:has(a span))').toArray();
+        const questions = $('.card-body').children('h4.title:not(:has(a span))').toArray();
 
         const promises = questions.map(async question => {
             const url = unleak($(question).children('a').attr('href'));
