@@ -18,7 +18,7 @@ const getPageCount = async url => {
     const response = await fetch(url);
     const html = unleak((await response.text()))
     const $ = load(html);
-    const baseCount = parseInt(unleak($('.pagination', '.panel-body').find('li').length));
+    const baseCount = parseInt(unleak($('.pagination', '.card-body').find('li').length));
     const pageCount = baseCount - (baseCount > 2 ? 2 : 0) + (baseCount === 0 ? 1 : 0);
     return pageCount;
 }
