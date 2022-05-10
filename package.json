@@ -1,21 +1,23 @@
 {
-  "name": "qna",
+  "name": "qnalert",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node --max-old-space-size=60 index.js"
+    "start": "node index.js"
   },
   "author": "battlesqui_d",
   "license": "ISC",
   "dependencies": {
-    "cheerio": "^1.0.0-rc.3",
-    "discord.js": "^12.2.0",
-    "dotenv": "^8.2.0",
-    "firebase-admin": "^9.2.0",
-    "node-cron": "^2.0.3",
-    "node-fetch": "^2.6.1",
+    "discord.js": "^13.6.0",
+    "dotenv": "^16.0.0",
+    "firebase-admin": "^10.2.0",
+    "node-cron": "^3.0.0",
+    "vex-qna-archiver": "^2.0.2",
     "winston": "^3.3.3"
+  },
+  "devDependencies": {
+    "eslint": "^8.15.0"
   }
 }
