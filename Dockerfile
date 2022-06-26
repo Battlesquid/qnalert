@@ -1,6 +1,3 @@
-FROM node:12.18.3
-WORKDIR /
-COPY package.json /
-RUN npm install
+FROM node:alpine
 COPY . /
-CMD node --max-old-space-size=50 index.js
+CMD npm i && npm run start
