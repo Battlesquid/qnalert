@@ -7,11 +7,9 @@ const generateEmbeds = async (category, questions) => {
     const colors = {
         "VRC": "#E62525",
         "VEXU": "#952CD1",
-        "VAIC-HS": "#4FDE28",
-        "VAIC-U": "#4FDE28",
+        "VAIC": "#4FDE28",
         "VIQC": "#226AE6",
-        "Judging": "#E6A122",
-        "RADC": "#4FDE28"
+        "Judging": "#E6A122"
     };
 
     const MAX_EMBEDS_PER_MSG = 10;

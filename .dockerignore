@@ -1,0 +1,5 @@
+.env
+logs
+.eslintignore
+.eslintrc
+node_modules
