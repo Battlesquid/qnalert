@@ -18,7 +18,5 @@ const client = new Client({
 
 (async () => {
     await client.login(process.env.DISCORD_BOT_TOKEN);
-    await scheduler.once(client);
-    client.destroy();
-    process.exit(0);
+    scheduler.start(client);
 })();
