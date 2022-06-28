@@ -10,6 +10,7 @@ module.exports.check = async (client, testCategories = []) => {
 
     const currentQuestions = await questions.current();
     const categories = groupby(currentQuestions, "category");
+    console.log(categories);
 
     for (const category in categories) {
         logger.info(`Processing unanswered questions for ${category}...`);
@@ -17,13 +18,14 @@ module.exports.check = async (client, testCategories = []) => {
         try {
             logger.info(`Fetching stored question queue for ${category}...`);
             const storedQuestions = await questions.getStored(category);
+            console.log(storedQuestions);
 
             //solely for testing purposes
             if (testCategories.includes(category)) {
                 storedQuestions.pop();
             }
 
-            const answeredQuestions = questions.diff(categories[category], storedQuestions);
+            const answeredQuestions = questions.diff(storedQuestions, categories[category]);
 
             if (!answeredQuestions.length) {
                 logger.info(`No new reponses for ${category}\n`);
